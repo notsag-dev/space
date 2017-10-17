@@ -1,18 +1,23 @@
+import ImageRing from './space-objects/image-ring';
+import { initTextures, textures } from './textures';
+
 /**
  * Init three.js, populate and animate the space.
  *
  */
-planets = []
+
+let spaceObjects = [];
 
 /**
  * Add planets
  * @param {THREE.Scene} scene
+ * @param {
  */
-let populate = function(scene) {
-    for (let i = 0; i < planets.length; i++) {
-        meshes = planets[i].getMeshes();
+let populate = function(scene, spaceObjects) {
+    for (let i = 0; i < spaceObjects.length; i++) {
+        let meshes = spaceObjects[i].meshes;
         for (let j = 0; j < meshes.length; j++) {
-            scene.add(meshes[j])
+            scene.add(meshes[j]);
         }
     }
 }
@@ -23,8 +28,8 @@ let populate = function(scene) {
  */
 let animate = function() {
     requestAnimationFrame(animate);
-    for (let i = 0; i < planets.length; i++) {
-        planets[i].animate()
+    for (let i = 0; i < spaceObjects.length; i++) {
+        spaceObjects[i].animate()
     }
     controls.update();
     render();
@@ -42,7 +47,7 @@ let render = function() {
 let scene = new THREE.Scene()
 let camera = new THREE.PerspectiveCamera(75,
     window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.z = 150;
+camera.position.z = 30;
 
 let controls = new THREE.TrackballControls(camera);
 controls.addEventListener('change', render);
@@ -51,5 +56,9 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-populate(scene);
-animate();
+// Load textures and start rendering
+initTextures().then(() => {
+    spaceObjects.push(new ImageRing(10, 'beatlesVinyl'));
+    populate(scene, spaceObjects);
+    animate();
+});

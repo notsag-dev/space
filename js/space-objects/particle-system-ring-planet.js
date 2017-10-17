@@ -1,10 +1,10 @@
 import Satellite from './satellite'
 
 /**
- * Planet with a ring system.
+ * Planet with a particle system ring.
  *
  */
-export default class RingPlanet {
+export default class ParticleSystemRingPlanet {
     constructor(planetMesh, ringParticleMaterial, ringParticlesCount) {
         this.meshes = [];
         this.satellites = [];
@@ -14,7 +14,7 @@ export default class RingPlanet {
     }
 
     /**
-     * Add ring particle system.
+     * Add the ring particle system.
      *
      */
     addRing(satellitesCount) {
@@ -22,7 +22,9 @@ export default class RingPlanet {
             let satelliteGeometry = new THREE.SphereGeometry(
                 Math.floor(Math.random() * ( - 300) + 250)
             );
-            let satelliteMesh = new THREE.Mesh(satelliteGeometry, planetMaterial);
+            let satelliteMesh = new THREE.Mesh(
+                satelliteGeometry, planetMaterial
+            );
 
             // TODO try adding the satellite to the planet directly.
             this.meshes.push(satelliteMesh);
@@ -35,6 +37,10 @@ export default class RingPlanet {
         }
     }
 
+    /**
+     * Animate the particles
+     *
+     */
     animate() {
         for (let i = 0; i < satellites.length; i++) {
             satellites[i].setPosition();
