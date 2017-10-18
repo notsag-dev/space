@@ -1,7 +1,16 @@
 let loader = new THREE.TextureLoader();
 
+// Textures to be loaded.
+// The file property is the route of the file under
+// the textures folder.
 let texturesInfo = [
-    { name: 'beatlesVinyl', file: 'beatlesVinyl.png' }
+    { name: 'beatlesVinyl', file: 'beatlesVinyl.png' },
+    { name: 'skyboxBack', file: 'skybox/back.png' },
+    { name: 'skyboxBottom', file: 'skybox/bottom.png' },
+    { name: 'skyboxFront', file: 'skybox/front.png' },
+    { name: 'skyboxLeft', file: 'skybox/left.png' },
+    { name: 'skyboxRight', file: 'skybox/right.png' },
+    { name: 'skyboxTop', file: 'skybox/top.png' }
 ]
 
 /**

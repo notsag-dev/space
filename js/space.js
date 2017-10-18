@@ -1,4 +1,5 @@
 import ImageRing from './space-objects/image-ring';
+import TexturedBox from './space-objects/textured-box';
 import { initTextures, textures } from './textures';
 
 /**
@@ -59,6 +60,9 @@ document.body.appendChild(renderer.domElement);
 // Load textures and start rendering
 initTextures().then(() => {
     spaceObjects.push(new ImageRing(10, 'beatlesVinyl'));
+    spaceObjects.push(new TexturedBox(1000,
+       ['skyboxRight', 'skyboxLeft', 'skyboxTop', 'skyboxBottom',
+        'skyboxFront', 'skyboxBack']));
     populate(scene, spaceObjects);
     animate();
 });

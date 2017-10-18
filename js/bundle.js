@@ -72,8 +72,17 @@
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return textures; });
 let loader = new THREE.TextureLoader();
 
+// Textures to be loaded.
+// The file property is the route of the file under
+// the textures folder.
 let texturesInfo = [
-    { name: 'beatlesVinyl', file: 'beatlesVinyl.png' }
+    { name: 'beatlesVinyl', file: 'beatlesVinyl.png' },
+    { name: 'skyboxBack', file: 'skybox/back.png' },
+    { name: 'skyboxBottom', file: 'skybox/bottom.png' },
+    { name: 'skyboxFront', file: 'skybox/front.png' },
+    { name: 'skyboxLeft', file: 'skybox/left.png' },
+    { name: 'skyboxRight', file: 'skybox/right.png' },
+    { name: 'skyboxTop', file: 'skybox/top.png' }
 ]
 
 /**
@@ -154,7 +163,9 @@ let initTextures = function() {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__space_objects_image_ring__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__textures__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__space_objects_textured_box__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__textures__ = __webpack_require__(0);
+
 
 
 
@@ -214,8 +225,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Load textures and start rendering
-Object(__WEBPACK_IMPORTED_MODULE_1__textures__["a" /* initTextures */])().then(() => {
+Object(__WEBPACK_IMPORTED_MODULE_2__textures__["a" /* initTextures */])().then(() => {
     spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_0__space_objects_image_ring__["a" /* default */](10, 'beatlesVinyl'));
+    spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_1__space_objects_textured_box__["a" /* default */](1000,
+       ['skyboxRight', 'skyboxLeft', 'skyboxTop', 'skyboxBottom',
+        'skyboxFront', 'skyboxBack']));
     populate(scene, spaceObjects);
     animate();
 });
@@ -232,7 +246,7 @@ Object(__WEBPACK_IMPORTED_MODULE_1__textures__["a" /* initTextures */])().then((
 class ImageRing {
     /**
      * Constructor.
-     * @param {number} radius - The ring's radius.
+     * @param {number} radius - The radius of the ring.
      * @param {string} textureName - The name of an already loaded texture to
      *      be used as the ring image.
      *
@@ -258,6 +272,54 @@ class ImageRing {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = ImageRing;
+
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textures__ = __webpack_require__(0);
+
+
+class TexturedBox {
+    /**
+     * Constructor.
+     * @param {number} edgeSize - The cube edge size.
+     * @param [number] textureNames - A list of 6 texture names.
+     *
+     */
+    constructor(edgeSize, textureNames) {
+
+        if (textureNames.length != 6) {
+            console.log('Error: textureNames must have 6 texture names');
+            return;
+        }
+
+        let materials = [];
+        for (let i = 0; i < 6; i++) {
+            materials.push(new THREE.MeshBasicMaterial(
+                { map: __WEBPACK_IMPORTED_MODULE_0__textures__["b" /* textures */][textureNames[i]], side: THREE.BackSide }
+            ));
+        }
+
+        // TODO Create other object type to do it with generic side size.
+        var geometry = new THREE.BoxGeometry(edgeSize, edgeSize, edgeSize);
+        this.boxMesh = new THREE.Mesh(geometry, materials);
+
+        this.meshes = []
+        this.meshes.push(this.boxMesh);
+    }
+
+    /**
+     * Animate.
+     *
+     */
+    animate() {
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TexturedBox;
 
 
 

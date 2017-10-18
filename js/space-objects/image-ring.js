@@ -3,7 +3,7 @@ import { textures } from '../textures';
 export default class ImageRing {
     /**
      * Constructor.
-     * @param {number} radius - The ring's radius.
+     * @param {number} radius - The radius of the ring.
      * @param {string} textureName - The name of an already loaded texture to
      *      be used as the ring image.
      *
