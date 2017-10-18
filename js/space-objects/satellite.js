@@ -8,8 +8,8 @@ export default class Satellite {
     /**
      * Get the current position of a satellite.
      *
-     * @param {number} radius - The radius of the circumference.
-     * @param {number} yearLength - time to revolve once around the center
+     * @param {number} radius - The radius of the orbit (circumference).
+     * @param {number} yearLength - Time to revolve once around the center
      *     in miliseconds.
      *
      */

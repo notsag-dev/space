@@ -1,6 +1,6 @@
-import ImageRing from './space-objects/image-ring';
-import TexturedBox from './space-objects/textured-box';
-import { initTextures, textures } from './textures';
+import SkyBox from './space-objects/sky-box';
+import TexturedCircle from './space-objects/textured-circle';
+import { initTextures } from './textures';
 
 /**
  * Init three.js, populate and animate the space.
@@ -59,10 +59,8 @@ document.body.appendChild(renderer.domElement);
 
 // Load textures and start rendering
 initTextures().then(() => {
-    spaceObjects.push(new ImageRing(10, 'beatlesVinyl'));
-    spaceObjects.push(new TexturedBox(1000,
-       ['skyboxRight', 'skyboxLeft', 'skyboxTop', 'skyboxBottom',
-        'skyboxFront', 'skyboxBack']));
+    spaceObjects.push(new TexturedCircle(10, 'beatlesVinyl'));
+    spaceObjects.push(new SkyBox());
     populate(scene, spaceObjects);
     animate();
 });

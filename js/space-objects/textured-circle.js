@@ -1,6 +1,6 @@
 import { textures } from '../textures';
 
-export default class ImageRing {
+export default class TexturedCircle {
     /**
      * Constructor.
      * @param {number} radius - The radius of the ring.
