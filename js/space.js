@@ -1,4 +1,5 @@
 import SkyBox from './space-objects/sky-box';
+import LightDecomposition from './space-objects/light-decomposition';
 import TexturedCircle from './space-objects/textured-circle';
 import { initTextures } from './textures';
 
@@ -59,8 +60,9 @@ document.body.appendChild(renderer.domElement);
 
 // Load textures and start rendering
 initTextures().then(() => {
-    spaceObjects.push(new TexturedCircle(10, 'beatlesVinyl'));
+    // spaceObjects.push(new TexturedCircle(10, 'beatlesVinyl'));
     spaceObjects.push(new SkyBox());
+    spaceObjects.push(new LightDecomposition(10));
     populate(scene, spaceObjects);
     animate();
 });

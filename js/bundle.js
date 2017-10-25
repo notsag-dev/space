@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -161,59 +161,10 @@ let initTextures = function() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textures__ = __webpack_require__(0);
-
-
-class TexturedBox {
-    /**
-     * Constructor.
-     * @param {THREE.Vector3} pos - The box position.
-     * @param {number} edgeSize - The cube edge size.
-     * @param [number] textureNames - A list of 6 texture names.
-     *
-     */
-    constructor(pos, edgeSize, textureNames) {
-        if (textureNames.length != 6) {
-            console.log('Error: textureNames must have 6 texture names');
-            return;
-        }
-
-        let materials = [];
-        for (let i = 0; i < 6; i++) {
-            materials.push(new THREE.MeshBasicMaterial(
-                { map: __WEBPACK_IMPORTED_MODULE_0__textures__["b" /* textures */][textureNames[i]], side: THREE.BackSide }
-            ));
-        }
-
-        // TODO Create other object type to do it with generic side size.
-        var geometry = new THREE.BoxGeometry(edgeSize, edgeSize, edgeSize);
-        this.boxMesh = new THREE.Mesh(geometry, materials);
-        this.boxMesh.position.set(pos.x, pos.y, pos.z);
-
-        this.meshes = []
-        this.meshes.push(this.boxMesh);
-    }
-
-    /**
-     * Animate.
-     *
-     */
-    animate() {
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = TexturedBox;
-
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__space_objects_sky_box__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__space_objects_textured_circle__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__space_objects_textured_box__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__space_objects_sky_box__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__space_objects_light_decomposition__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__space_objects_textured_circle__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__textures__ = __webpack_require__(0);
 
 
@@ -277,19 +228,20 @@ document.body.appendChild(renderer.domElement);
 
 // Load textures and start rendering
 Object(__WEBPACK_IMPORTED_MODULE_3__textures__["a" /* initTextures */])().then(() => {
-    spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_1__space_objects_textured_circle__["a" /* default */](10, 'beatlesVinyl'));
+    // spaceObjects.push(new TexturedCircle(10, 'beatlesVinyl'));
     spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_0__space_objects_sky_box__["a" /* default */]());
+    spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_1__space_objects_light_decomposition__["a" /* default */](10));
     populate(scene, spaceObjects);
     animate();
 });
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textured_box__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textured_box__ = __webpack_require__(3);
 
 
 /**
@@ -311,7 +263,196 @@ class SkyBox extends __WEBPACK_IMPORTED_MODULE_0__textured_box__["a" /* default 
 
 
 /***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textures__ = __webpack_require__(0);
+
+
+class TexturedBox {
+    /**
+     * Constructor.
+     * @param {THREE.Vector3} pos - The box position.
+     * @param {number} edgeSize - The cube edge size.
+     * @param [number] textureNames - A list of 6 texture names.
+     *
+     */
+    constructor(pos, edgeSize, textureNames) {
+        if (textureNames.length != 6) {
+            console.log('Error: textureNames must have 6 texture names');
+            return;
+        }
+
+        let materials = [];
+        for (let i = 0; i < 6; i++) {
+            materials.push(new THREE.MeshBasicMaterial(
+                { map: __WEBPACK_IMPORTED_MODULE_0__textures__["b" /* textures */][textureNames[i]], side: THREE.BackSide }
+            ));
+        }
+
+        // TODO Create other object type to do it with generic side size.
+        var geometry = new THREE.BoxGeometry(edgeSize, edgeSize, edgeSize);
+        this.boxMesh = new THREE.Mesh(geometry, materials);
+        this.boxMesh.position.set(pos.x, pos.y, pos.z);
+
+        this.meshes = []
+        this.meshes.push(this.boxMesh);
+    }
+
+    /**
+     * Animate.
+     *
+     */
+    animate() {
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TexturedBox;
+
+
+
+/***/ }),
 /* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__geometries__ = __webpack_require__(5);
+
+
+class LightDecomposition {
+    constructor() {
+        this.meshes = [];
+
+        // Pyramid
+        let geometry = Object(__WEBPACK_IMPORTED_MODULE_0__geometries__["a" /* getPyramidGeometry */])(10, 10, 10);
+        let material = new THREE.MeshBasicMaterial(
+            { color: 0xffffff, wireframe: true, side: THREE.DoubleSide }
+        );
+        this.pyramid = new THREE.Mesh(geometry, material);
+        this.meshes.push(this.pyramid);
+
+        // Find intersection between the light and the prism
+        let origin = new THREE.Vector3(-20, 5, 0);
+        let dir = new THREE.Vector3(1, 0, 0).normalize();
+        let intersec = this.findIntersection(origin, dir, this.pyramid);
+        intersec.x += 0.0001;
+
+        // Create the line for the initial ray
+        let line = this.getLine(origin, intersec);
+        this.meshes.push(line);
+
+        // Get all refracted rays inside the pyramid
+        for (let i = 1; i < 8; i++) {
+            this.meshes.push(
+                this.getRefractedLine(intersec, dir, -i / 150, this.pyramid)
+            );
+        }
+    }
+
+    /**
+     * Get a refracted line inside the prism from the
+     * information of the original ray.
+     *
+     * @param {THREE.Vector3} dir - The direction of the original ray
+     *      coming into contact with the prism.
+     * @param {THREE.Vector3} origin - The contact point between the
+     *      original ray and the prism. This will be the origin of
+     *      the new refracted line.
+     * @param {number} angle - The refraction angle.
+     * @param {THREE.Mesh} mesh - The prism.
+     *
+     */
+    getRefractedLine(origin, dir, angle, mesh) {
+        let zAxis = new THREE.Vector3(0, 0, 1);
+        dir.applyAxisAngle(zAxis, angle);
+        let intersec = this.findIntersection(origin, dir, mesh);
+        if (!intersec){
+            return null;
+        }
+        return this.getLine(origin, intersec);
+    }
+
+    /**
+     * Create a ray from an origin with a direction and find
+     * its intersection with a mesh.
+     *
+     * @param {THREE.Vector3} origin - The origin of the ray.
+     * @param {THREE.Vector3} dir - The direction of the ray (normalized).
+     * @param {THREE.Mesh} mesh - The mesh to find the intersection.
+     *
+     */
+    findIntersection(origin, dir, mesh) {
+        console.log(mesh);
+        let ray = new THREE.Raycaster(origin, dir);
+        let intersects = ray.intersectObject(mesh);
+        if (!intersects.length) {
+            return null;
+        }
+        let point = intersects[0].point;
+        return new THREE.Vector3(point.x, point.y, point.z);
+    }
+
+    /**
+     * Get a line from two points.
+     *
+     */
+    getLine(point1, point2) {
+        let lineMaterial = new THREE.LineBasicMaterial();
+        let geoRay1 = new THREE.Geometry();
+        geoRay1.vertices.push(point1);
+        geoRay1.vertices.push(point2);
+        return new THREE.Line(geoRay1, lineMaterial);
+    }
+
+    animate() {
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = LightDecomposition;
+
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getPyramidGeometry; });
+/**
+ * Get a pyramid geometry.
+ *
+ */
+let getPyramidGeometry = function(width, length, height) {
+    let geometry = new THREE.Geometry();
+
+    geometry.vertices = [
+        new THREE.Vector3(-0.5, 0, -0.5),
+        new THREE.Vector3(0.5, 0, -0.5),
+        new THREE.Vector3(0.5, 0, 0.5),
+        new THREE.Vector3(-0.5, 0, 0.5),
+        new THREE.Vector3(0, 1, 0)
+    ];
+
+    geometry.faces = [
+        new THREE.Face3(0, 1, 2),
+        new THREE.Face3(0, 2, 3),
+        new THREE.Face3(1, 0, 4),
+        new THREE.Face3(2, 1, 4),
+        new THREE.Face3(3, 2, 4),
+        new THREE.Face3(0, 3, 4)
+    ];
+
+    var transformation =
+        new THREE.Matrix4().makeScale(width, length, height);
+    geometry.applyMatrix(transformation);
+
+    return geometry;
+}
+
+
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -346,7 +487,7 @@ class TexturedCircle {
         this.ring.rotation.z -= 0.05;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = TexturedCircle;
+/* unused harmony export default */
 
 
 
