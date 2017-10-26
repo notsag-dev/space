@@ -12,9 +12,10 @@ export default class LightDecomposition {
         this.pyramid = new THREE.Mesh(geometry, material);
         this.meshes.push(this.pyramid);
 
-        // Find intersection between the light and the prism
-        let origin = new THREE.Vector3(-20, 5, 0);
-        let dir = new THREE.Vector3(1, 0, 0).normalize();
+        // Find the intersection between the "light" (represented as a line)
+        // and the pyramid
+        let origin = new THREE.Vector3(-15, 0, 0);
+        let dir = new THREE.Vector3(1, 0.4, 0).normalize();
         let intersec = this.findIntersection(origin, dir, this.pyramid);
         intersec.x += 0.0001;
 
@@ -25,7 +26,7 @@ export default class LightDecomposition {
         // Get all refracted rays inside the pyramid
         for (let i = 1; i < 8; i++) {
             this.meshes.push(
-                this.getRefractedLine(intersec, dir, -i / 150, this.pyramid)
+                this.getRefractedLine(intersec, dir, -(0.25 + i / 30), this.pyramid)
             );
         }
     }
@@ -45,8 +46,9 @@ export default class LightDecomposition {
      */
     getRefractedLine(origin, dir, angle, mesh) {
         let zAxis = new THREE.Vector3(0, 0, 1);
-        dir.applyAxisAngle(zAxis, angle);
-        let intersec = this.findIntersection(origin, dir, mesh);
+        let dirClone = dir.clone();
+        dirClone.applyAxisAngle(zAxis, angle);
+        let intersec = this.findIntersection(origin, dirClone, mesh);
         if (!intersec){
             return null;
         }
@@ -54,7 +56,7 @@ export default class LightDecomposition {
     }
 
     /**
-     * Create a ray from an origin with a direction and find
+     * Create a ray from an origin with a direction and return
      * its intersection with a mesh.
      *
      * @param {THREE.Vector3} origin - The origin of the ray.
@@ -63,7 +65,6 @@ export default class LightDecomposition {
      *
      */
     findIntersection(origin, dir, mesh) {
-        console.log(mesh);
         let ray = new THREE.Raycaster(origin, dir);
         let intersects = ray.intersectObject(mesh);
         if (!intersects.length) {
@@ -79,10 +80,10 @@ export default class LightDecomposition {
      */
     getLine(point1, point2) {
         let lineMaterial = new THREE.LineBasicMaterial();
-        let geoRay1 = new THREE.Geometry();
-        geoRay1.vertices.push(point1);
-        geoRay1.vertices.push(point2);
-        return new THREE.Line(geoRay1, lineMaterial);
+        let geoRay = new THREE.Geometry();
+        geoRay.vertices.push(point1);
+        geoRay.vertices.push(point2);
+        return new THREE.Line(geoRay, lineMaterial);
     }
 
     animate() {
