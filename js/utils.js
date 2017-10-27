@@ -2,6 +2,8 @@
  * Generate a random int between min and max
  *
  */
-export getRandomInt = function (min, max) {
+let getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export { getRandomInt }

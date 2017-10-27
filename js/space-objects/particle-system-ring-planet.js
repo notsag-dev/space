@@ -6,10 +6,10 @@ import Satellite from './satellite'
  */
 export default class ParticleSystemRingPlanet {
     constructor(planetMesh, ringParticleMaterial, ringParticlesCount) {
-        this.meshes = [];
+        this.sceneObjects = [];
         this.satellites = [];
 
-        meshes.push(planetMesh);
+        sceneObjects.push(planetMesh);
         this.addRing(ringParticleCount);
     }
 
@@ -27,7 +27,7 @@ export default class ParticleSystemRingPlanet {
             );
 
             // TODO try adding the satellite to the planet directly.
-            this.meshes.push(satelliteMesh);
+            this.sceneObjects.push(satelliteMesh);
 
             this.satellites.push(new Satellite(
                 satelliteMesh,

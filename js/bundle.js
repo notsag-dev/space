@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -161,11 +161,76 @@ let initTextures = function() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(7);
+
+/**
+ * Particle emitter. The particles are aligned and they have
+ * a movement direction.
+ *
+ * @param {THREE.Vector3} position - The position of the emitter
+ * @param {THREE.Vector3} direction - The movement direction
+ * @param {Hex} particleColor - The hex particle color.
+ * @param {Number} length - The length of the particles line.
+ * @param {Number} number - The number of particles.
+ *
+ */
+class LineEmitter {
+    constructor(position, direction, particleColor, length, number) {
+        this.position = position;
+        this.direction = direction;
+        this.particleColor = particleColor;
+        this.length = length;
+
+        this.sceneObjects = [];
+        this.timer = 0;
+        let particles = new THREE.Geometry();
+        let material = new THREE.PointsMaterial(
+            {color: particleColor, size: 1}
+        );
+
+        for (let i = 0; i < number; i++) {
+            let distance = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* getRandomInt */])(0, length);
+            let pos = position.clone();
+            pos.add(direction.clone().multiplyScalar(distance));
+            particles.vertices.push(pos);
+        }
+
+        this.particleSystem = new THREE.Points(
+            particles,
+            material);
+
+       this.sceneObjects.push(this.particleSystem);
+    }
+
+    animate(delta) {
+        this.timer += delta;
+        let geometry = this.particleSystem.geometry;
+        let dir = this.direction;
+        for (let i = 0; i < geometry.vertices.length; i++) {
+            geometry.vertices[i].addScaledVector(this.direction, delta * 10);
+            if (geometry.vertices[i].distanceTo(this.position) > this.length) {
+                geometry.vertices[i] = this.position.clone();
+            }
+        }
+        geometry.verticesNeedUpdate = true;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = LineEmitter;
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__space_objects_sky_box__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__space_objects_light_decomposition__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__space_objects_textured_circle__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__space_objects_sky_box__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__space_objects_light_decomposition__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__space_objects_textured_circle__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__textures__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__space_objects_line_emitter__ = __webpack_require__(1);
+
 
 
 
@@ -177,6 +242,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  */
 
 let spaceObjects = [];
+let clock = new THREE.Clock();
 
 /**
  * Add planets
@@ -185,9 +251,9 @@ let spaceObjects = [];
  */
 let populate = function(scene, spaceObjects) {
     for (let i = 0; i < spaceObjects.length; i++) {
-        let meshes = spaceObjects[i].meshes;
-        for (let j = 0; j < meshes.length; j++) {
-            scene.add(meshes[j]);
+        let sceneObjects = spaceObjects[i].sceneObjects;
+        for (let j = 0; j < sceneObjects.length; j++) {
+            scene.add(sceneObjects[j]);
         }
     }
 }
@@ -197,9 +263,10 @@ let populate = function(scene, spaceObjects) {
  *
  */
 let animate = function() {
+    let delta = clock.getDelta();
     requestAnimationFrame(animate);
     for (let i = 0; i < spaceObjects.length; i++) {
-        spaceObjects[i].animate()
+        spaceObjects[i].animate(delta)
     }
     controls.update();
     render();
@@ -228,20 +295,28 @@ document.body.appendChild(renderer.domElement);
 
 // Load textures and start rendering
 Object(__WEBPACK_IMPORTED_MODULE_3__textures__["a" /* initTextures */])().then(() => {
-    // spaceObjects.push(new TexturedCircle(10, 'beatlesVinyl'));
+    spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_2__space_objects_textured_circle__["a" /* default */](50, 'beatlesVinyl',
+        new THREE.Vector3(30, -30, -150)));
     spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_0__space_objects_sky_box__["a" /* default */]());
     spaceObjects.push(new __WEBPACK_IMPORTED_MODULE_1__space_objects_light_decomposition__["a" /* default */](10));
+    /*spaceObjects.push(new LineEmitter(
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(1, 0, 0),
+        0x00ff00,
+        50,
+        30
+    ));*/
     populate(scene, spaceObjects);
     animate();
 });
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textured_box__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__textured_box__ = __webpack_require__(4);
 
 
 /**
@@ -263,7 +338,7 @@ class SkyBox extends __WEBPACK_IMPORTED_MODULE_0__textured_box__["a" /* default 
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -296,8 +371,8 @@ class TexturedBox {
         this.boxMesh = new THREE.Mesh(geometry, materials);
         this.boxMesh.position.set(pos.x, pos.y, pos.z);
 
-        this.meshes = []
-        this.meshes.push(this.boxMesh);
+        this.sceneObjects = []
+        this.sceneObjects.push(this.boxMesh);
     }
 
     /**
@@ -312,16 +387,23 @@ class TexturedBox {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__geometries__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__geometries__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__line_emitter__ = __webpack_require__(1);
+
 
 
 class LightDecomposition {
     constructor() {
-        this.meshes = [];
+        this.sceneObjects = [];
+        this.emitters = [];
+
+        // TODO Move to configs
+        this.colors = [0xff1b28, 0xfdfa1f, 0x3bc720, 0x1d94bc, 0x1d94bc,
+            0x5c37b8];
 
         // Pyramid
         let geometry = Object(__WEBPACK_IMPORTED_MODULE_0__geometries__["a" /* getPyramidGeometry */])(10, 10, 10);
@@ -329,30 +411,29 @@ class LightDecomposition {
             { color: 0xffffff, wireframe: true, side: THREE.DoubleSide }
         );
         this.pyramid = new THREE.Mesh(geometry, material);
-        this.meshes.push(this.pyramid);
+        this.sceneObjects.push(this.pyramid);
 
-        // Find the intersection between the "light" (represented as a line)
-        // and the pyramid
+        // White light
         let origin = new THREE.Vector3(-15, 0, 0);
         let dir = new THREE.Vector3(1, 0.4, 0).normalize();
         let intersec = this.findIntersection(origin, dir, this.pyramid);
         intersec.x += 0.0001;
 
-        // Create the line for the initial ray
-        let line = this.getLine(origin, intersec);
-        this.meshes.push(line);
+        let length = origin.distanceTo(intersec);
+        let whiteLight = new __WEBPACK_IMPORTED_MODULE_1__line_emitter__["a" /* default */](origin, dir, 0xffffff, length, 120);
+        this.emitters.push(whiteLight);
+        this.sceneObjects.push(whiteLight.sceneObjects[0]);
 
-        // Get all refracted rays inside the pyramid
-        for (let i = 1; i < 8; i++) {
-            this.meshes.push(
-                this.getRefractedLine(intersec, dir, -(0.25 + i / 30), this.pyramid)
-            );
+        // Get all refracted rays
+        for (let i = 0; i < 6; i++) {
+            this.createRefraction(intersec, dir, -(0.25 + i / 30), this.colors[i]);
         }
     }
 
     /**
-     * Get a refracted line inside the prism from the
-     * information of the original ray.
+     * Create the refracted line inside the prism from the
+     * information of the original ray, and the particles
+     * emitters.
      *
      * @param {THREE.Vector3} dir - The direction of the original ray
      *      coming into contact with the prism.
@@ -360,18 +441,24 @@ class LightDecomposition {
      *      original ray and the prism. This will be the origin of
      *      the new refracted line.
      * @param {number} angle - The refraction angle.
-     * @param {THREE.Mesh} mesh - The prism.
+     * @param {THREE.Object3d} object - The 3d object.
      *
      */
-    getRefractedLine(origin, dir, angle, mesh) {
+    createRefraction(origin, dir, angle, color) {
         let zAxis = new THREE.Vector3(0, 0, 1);
         let dirClone = dir.clone();
         dirClone.applyAxisAngle(zAxis, angle);
-        let intersec = this.findIntersection(origin, dirClone, mesh);
+        let intersec = this.findIntersection(origin, dirClone, this.pyramid);
+
         if (!intersec){
             return null;
         }
-        return this.getLine(origin, intersec);
+
+        let emitter = new __WEBPACK_IMPORTED_MODULE_1__line_emitter__["a" /* default */](intersec, dirClone, color, 50, 70);
+
+        this.emitters.push(emitter);
+        this.sceneObjects.push(this.getLine(origin, intersec));
+        this.sceneObjects.push(emitter.sceneObjects[0]);
     }
 
     /**
@@ -405,7 +492,14 @@ class LightDecomposition {
         return new THREE.Line(geoRay, lineMaterial);
     }
 
-    animate() {
+    /**
+     * Animate the light decomposition (animate the emitters)
+     *
+     */
+    animate(delta) {
+        for (let i = 0; i < this.emitters.length; i++) {
+            this.emitters[i].animate(delta);
+        }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = LightDecomposition;
@@ -413,7 +507,7 @@ class LightDecomposition {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -453,7 +547,24 @@ let getPyramidGeometry = function(width, length, height) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getRandomInt; });
+/**
+ * Generate a random int between min and max
+ *
+ */
+let getRandomInt = function (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -466,18 +577,21 @@ class TexturedCircle {
      * @param {number} radius - The radius of the ring.
      * @param {string} textureName - The name of an already loaded texture to
      *      be used as the ring image.
+     * @param {THREE.Vector3} position - The initial position.
      *
      */
-    constructor(radius, textureName) {
-        this.meshes = []
+    constructor(radius, textureName, position) {
         let material = new THREE.MeshBasicMaterial({
             map: __WEBPACK_IMPORTED_MODULE_0__textures__["b" /* textures */][textureName],
             side: THREE.DoubleSide
         });
         let geometry = new THREE.CircleGeometry(radius, 32);
         this.ring = new THREE.Mesh(geometry, material);
-        this.ring.rotation.x = -Math.PI / 3;
-        this.meshes.push(this.ring);
+        this.ring.rotation.x = -Math.PI / 2;
+        this.ring.position.set(position.x, position.y, position.z);
+
+        this.sceneObjects = []
+        this.sceneObjects.push(this.ring);
     }
 
     /**
@@ -488,7 +602,7 @@ class TexturedCircle {
         this.ring.rotation.z -= 0.05;
     }
 }
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = TexturedCircle;
 
 
 

@@ -26,8 +26,8 @@ export default class TexturedBox {
         this.boxMesh = new THREE.Mesh(geometry, materials);
         this.boxMesh.position.set(pos.x, pos.y, pos.z);
 
-        this.meshes = []
-        this.meshes.push(this.boxMesh);
+        this.sceneObjects = []
+        this.sceneObjects.push(this.boxMesh);
     }
 
     /**

@@ -1,8 +1,14 @@
 import { getPyramidGeometry } from './geometries'
+import LineEmitter from './line-emitter';
 
 export default class LightDecomposition {
     constructor() {
-        this.meshes = [];
+        this.sceneObjects = [];
+        this.emitters = [];
+
+        // TODO Move to configs
+        this.colors = [0xff1b28, 0xfdfa1f, 0x3bc720, 0x1d94bc, 0x1d94bc,
+            0x5c37b8];
 
         // Pyramid
         let geometry = getPyramidGeometry(10, 10, 10);
@@ -10,30 +16,29 @@ export default class LightDecomposition {
             { color: 0xffffff, wireframe: true, side: THREE.DoubleSide }
         );
         this.pyramid = new THREE.Mesh(geometry, material);
-        this.meshes.push(this.pyramid);
+        this.sceneObjects.push(this.pyramid);
 
-        // Find the intersection between the "light" (represented as a line)
-        // and the pyramid
+        // White light
         let origin = new THREE.Vector3(-15, 0, 0);
         let dir = new THREE.Vector3(1, 0.4, 0).normalize();
         let intersec = this.findIntersection(origin, dir, this.pyramid);
         intersec.x += 0.0001;
 
-        // Create the line for the initial ray
-        let line = this.getLine(origin, intersec);
-        this.meshes.push(line);
+        let length = origin.distanceTo(intersec);
+        let whiteLight = new LineEmitter(origin, dir, 0xffffff, length, 120);
+        this.emitters.push(whiteLight);
+        this.sceneObjects.push(whiteLight.sceneObjects[0]);
 
-        // Get all refracted rays inside the pyramid
-        for (let i = 1; i < 8; i++) {
-            this.meshes.push(
-                this.getRefractedLine(intersec, dir, -(0.25 + i / 30), this.pyramid)
-            );
+        // Get all refracted rays
+        for (let i = 0; i < 6; i++) {
+            this.createRefraction(intersec, dir, -(0.25 + i / 30), this.colors[i]);
         }
     }
 
     /**
-     * Get a refracted line inside the prism from the
-     * information of the original ray.
+     * Create the refracted line inside the prism from the
+     * information of the original ray, and the particles
+     * emitters.
      *
      * @param {THREE.Vector3} dir - The direction of the original ray
      *      coming into contact with the prism.
@@ -41,18 +46,24 @@ export default class LightDecomposition {
      *      original ray and the prism. This will be the origin of
      *      the new refracted line.
      * @param {number} angle - The refraction angle.
-     * @param {THREE.Mesh} mesh - The prism.
+     * @param {THREE.Object3d} object - The 3d object.
      *
      */
-    getRefractedLine(origin, dir, angle, mesh) {
+    createRefraction(origin, dir, angle, color) {
         let zAxis = new THREE.Vector3(0, 0, 1);
         let dirClone = dir.clone();
         dirClone.applyAxisAngle(zAxis, angle);
-        let intersec = this.findIntersection(origin, dirClone, mesh);
+        let intersec = this.findIntersection(origin, dirClone, this.pyramid);
+
         if (!intersec){
             return null;
         }
-        return this.getLine(origin, intersec);
+
+        let emitter = new LineEmitter(intersec, dirClone, color, 50, 70);
+
+        this.emitters.push(emitter);
+        this.sceneObjects.push(this.getLine(origin, intersec));
+        this.sceneObjects.push(emitter.sceneObjects[0]);
     }
 
     /**
@@ -86,6 +97,13 @@ export default class LightDecomposition {
         return new THREE.Line(geoRay, lineMaterial);
     }
 
-    animate() {
+    /**
+     * Animate the light decomposition (animate the emitters)
+     *
+     */
+    animate(delta) {
+        for (let i = 0; i < this.emitters.length; i++) {
+            this.emitters[i].animate(delta);
+        }
     }
 }
