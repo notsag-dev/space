@@ -2,6 +2,7 @@ import SkyBox from './space-objects/sky-box';
 import LightDecomposition from './space-objects/light-decomposition';
 import TexturedCircle from './space-objects/textured-circle';
 import { initTextures } from './textures';
+import LineEmitter from './space-objects/line-emitter';
 
 /**
  * Init three.js, populate and animate the space.
@@ -9,6 +10,7 @@ import { initTextures } from './textures';
  */
 
 let spaceObjects = [];
+let clock = new THREE.Clock();
 
 /**
  * Add planets
@@ -17,9 +19,9 @@ let spaceObjects = [];
  */
 let populate = function(scene, spaceObjects) {
     for (let i = 0; i < spaceObjects.length; i++) {
-        let meshes = spaceObjects[i].meshes;
-        for (let j = 0; j < meshes.length; j++) {
-            scene.add(meshes[j]);
+        let sceneObjects = spaceObjects[i].sceneObjects;
+        for (let j = 0; j < sceneObjects.length; j++) {
+            scene.add(sceneObjects[j]);
         }
     }
 }
@@ -29,9 +31,10 @@ let populate = function(scene, spaceObjects) {
  *
  */
 let animate = function() {
+    let delta = clock.getDelta();
     requestAnimationFrame(animate);
     for (let i = 0; i < spaceObjects.length; i++) {
-        spaceObjects[i].animate()
+        spaceObjects[i].animate(delta)
     }
     controls.update();
     render();
@@ -60,9 +63,17 @@ document.body.appendChild(renderer.domElement);
 
 // Load textures and start rendering
 initTextures().then(() => {
-    // spaceObjects.push(new TexturedCircle(10, 'beatlesVinyl'));
+    spaceObjects.push(new TexturedCircle(50, 'beatlesVinyl',
+        new THREE.Vector3(30, -30, -150)));
     spaceObjects.push(new SkyBox());
     spaceObjects.push(new LightDecomposition(10));
+    /*spaceObjects.push(new LineEmitter(
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(1, 0, 0),
+        0x00ff00,
+        50,
+        30
+    ));*/
     populate(scene, spaceObjects);
     animate();
 });
