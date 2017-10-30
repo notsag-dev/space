@@ -13,39 +13,36 @@ import { getRandomInt } from '../utils';
 export default class LineEmitter {
     constructor(position, direction, particleColor, length, number) {
         this.position = position;
-        this.direction = direction;
+        this.direction = direction.normalize();
         this.particleColor = particleColor;
         this.length = length;
-
         this.sceneObjects = [];
-        this.timer = 0;
+        this.time = 0;
+
         let particles = new THREE.Geometry();
         let material = new THREE.PointsMaterial(
-            {color: particleColor, size: 1}
+            { color: particleColor, size: 1 }
         );
-
-        for (let i = 0; i < number; i++) {
+        for (let i = 1; i <= number; i++) {
             let distance = getRandomInt(0, length);
             let pos = position.clone();
-            pos.add(direction.clone().multiplyScalar(distance));
+            pos.addScaledVector(direction, distance);
             particles.vertices.push(pos);
         }
-
-        this.particleSystem = new THREE.Points(
-            particles,
-            material);
-
-       this.sceneObjects.push(this.particleSystem);
+        this.particleSystem = new THREE.Points(particles,material);
+        this.sceneObjects.push(this.particleSystem);
     }
 
     animate(delta) {
-        this.timer += delta;
+        this.time += delta;
         let geometry = this.particleSystem.geometry;
-        let dir = this.direction;
         for (let i = 0; i < geometry.vertices.length; i++) {
-            geometry.vertices[i].addScaledVector(this.direction, delta * 10);
-            if (geometry.vertices[i].distanceTo(this.position) > this.length) {
-                geometry.vertices[i] = this.position.clone();
+            geometry.vertices[i].addScaledVector(this.direction, delta * 5);
+            let distanceOrigin = geometry.vertices[i].distanceTo(this.position);
+            if (distanceOrigin > this.length) {
+                let pos = this.position.clone();
+                geometry.vertices[i] = pos.addScaledVector(this.direction,
+                    distanceOrigin - this.length);
             }
         }
         geometry.verticesNeedUpdate = true;

@@ -66,7 +66,7 @@ initTextures().then(() => {
     spaceObjects.push(new TexturedCircle(50, 'beatlesVinyl',
         new THREE.Vector3(30, -30, -150)));
     spaceObjects.push(new SkyBox());
-    spaceObjects.push(new LightDecomposition(10));
+    spaceObjects.push(new LightDecomposition(15));
     /*spaceObjects.push(new LineEmitter(
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(1, 0, 0),
