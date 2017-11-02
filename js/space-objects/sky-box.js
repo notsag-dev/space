@@ -9,7 +9,7 @@ import TexturedBox from './textured-box';
  */
 export default class SkyBox extends TexturedBox {
     constructor() {
-        super(new THREE.Vector3(0, 0, 0), 1000,
+        super(new THREE.Vector3(0, 0, 0), 100000,
             ['skyboxRight', 'skyboxLeft', 'skyboxTop', 'skyboxBottom',
             'skyboxFront', 'skyboxBack']);
     }

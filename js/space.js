@@ -51,7 +51,7 @@ let render = function() {
 // Init Three
 let scene = new THREE.Scene()
 let camera = new THREE.PerspectiveCamera(75,
-    window.innerWidth/window.innerHeight, 0.1, 1000);
+    window.innerWidth/window.innerHeight, 0.1, 100000);
 camera.position.z = 30;
 
 let controls = new THREE.TrackballControls(camera);
@@ -66,14 +66,7 @@ initTextures().then(() => {
     spaceObjects.push(new TexturedCircle(50, 'beatlesVinyl',
         new THREE.Vector3(30, -30, -150)));
     spaceObjects.push(new SkyBox());
-    spaceObjects.push(new LightDecomposition(15));
-    /*spaceObjects.push(new LineEmitter(
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(1, 0, 0),
-        0x00ff00,
-        50,
-        30
-    ));*/
+    spaceObjects.push(new LightDecomposition(30));
     populate(scene, spaceObjects);
     animate();
 });

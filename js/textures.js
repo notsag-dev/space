@@ -68,7 +68,7 @@ let initTextures = function() {
     return new Promise((resolve, reject) => {
         Promise.all(loadTextures())
            .then(function (res) {
-               for(let i = 0; i < res.length; i++) {
+               for (let i = 0; i < res.length; i++) {
                    textures[res[i].name] = res[i].texture;
                }
                resolve();

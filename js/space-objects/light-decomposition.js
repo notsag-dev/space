@@ -1,16 +1,41 @@
 import { getPyramidGeometry } from './geometries'
 import LineEmitter from './line-emitter';
+import RandomLineEmitter from './random-line-emitter';
+import PatternLineEmitter from './pattern-line-emitter';
+import { getTextPattern, getLinePattern } from '../letters';
 
 export default class LightDecomposition {
     constructor(pyramidSize) {
+        this.pyramidSize = pyramidSize;
         this.sceneObjects = [];
         this.emitters = [];
 
         // TODO Move to configs
-        this.colors = [0xff1b28, 0xfdfa1f, 0x3bc720, 0x1d94bc, 0x1d94bc,
+        this.colors = [0xff1b28, 0xff8000, 0xfdfa1f, 0x3bc720, 0x1d94bc,
             0x5c37b8];
 
-        // Pyramid
+        this.createPyramid(pyramidSize);
+
+        let origin = new THREE.Vector3(-1.5 * pyramidSize, 0, 0);
+        let dir = new THREE.Vector3(1, 0.4, 0).normalize();
+        let intersec = this.createWhiteLightEmitter(origin, dir, pyramidSize);
+
+        // Create refracted rays and get all their intersections
+        // with the pyramid.
+        let pattern = getTextPattern('pink floyd');
+        console.log(pattern);
+        for (let i = 0; i < 6; i++) {
+            console.log(getLinePattern(pattern, i));
+            this.createRefraction(intersec, dir, -(0.25 + i / 40),
+                this.colors[i], getLinePattern(pattern, i));
+        }
+    }
+
+    /**
+     * Create the pyramid and add it to the scene objects array.
+     *
+     */
+    createPyramid(pyramidSize) {
         let geometry = getPyramidGeometry(pyramidSize, pyramidSize,
             pyramidSize);
         let material = new THREE.MeshBasicMaterial({
@@ -19,28 +44,27 @@ export default class LightDecomposition {
             transparent: true,
             opacity: 0.2
         });
-
         this.pyramid = new THREE.Mesh(geometry, material);
         this.sceneObjects.push(this.pyramid);
+    }
 
-        // White light
-        let origin = new THREE.Vector3(-1.5 * pyramidSize, 0, 0);
-        let dir = new THREE.Vector3(1, 0.4, 0).normalize();
+    /**
+     * Create the white light particles emitter.
+     *
+     * @returns THREE.Vector3 The intersection between the white light
+     *      and the pyramid.
+     */
+    createWhiteLightEmitter(origin, dir, pyramidSize) {
         let intersec = this.findIntersection(origin, dir, this.pyramid);
         intersec.x += 0.0001;
 
         let length = origin.distanceTo(intersec);
-        let whiteLight = new LineEmitter(origin, dir, 0xffffff, length,
+        let whiteLight = new RandomLineEmitter(origin, dir, 0xffffff, length,
             pyramidSize * 2);
         this.emitters.push(whiteLight);
         this.sceneObjects.push(whiteLight.sceneObjects[0]);
 
-        // Create refracted rays and get all their intersections
-        // with the pyramid.
-        for (let i = 0; i < 6; i++) {
-            this.createRefraction(intersec, dir, -(0.25 + i / 40),
-                this.colors[i]);
-        }
+        return intersec;
     }
 
     /**
@@ -57,27 +81,29 @@ export default class LightDecomposition {
      * @param THREE.Object3d object - The 3d object.
      *
      */
-    createRefraction(origin, dir, angle, color) {
+    createRefraction(origin, dir, angle, color, pattern) {
         let zAxis = new THREE.Vector3(0, 0, 1);
         let dirRefr1 = dir.clone();
         let dirRefr2 = dir.clone();
 
         dirRefr1.applyAxisAngle(zAxis, angle);
         let intersec = this.findIntersection(origin, dirRefr1, this.pyramid);
-        if (!intersec){
+        if (!intersec) {
             return null;
         }
 
         // Emitter inside the pyramid.
         let dist = origin.distanceTo(intersec);
-        let insideEmitter = new LineEmitter(origin, dirRefr1, 0xc0c0c0,
-            dist, 10);
+        let insideEmitter = new RandomLineEmitter(origin, dirRefr1, 0xc0c0c0,
+            dist, this.pyramidSize);
         this.emitters.push(insideEmitter);
         this.sceneObjects.push(insideEmitter.sceneObjects[0]);
 
         // Color emitter
         dirRefr2.applyAxisAngle(zAxis, angle * 1.5);
-        let colorEmitter = new LineEmitter(intersec, dirRefr2, color, 50, 30);
+
+        let colorEmitter = new PatternLineEmitter(intersec, dirRefr2, color,
+            this.pyramidSize * 10, this.pyramidSize * 10, pattern);
         this.emitters.push(colorEmitter);
         this.sceneObjects.push(colorEmitter.sceneObjects[0]);
     }
